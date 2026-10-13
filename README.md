@@ -24,7 +24,7 @@ release's `SHA256SUMS.txt`. Nothing is rebuilt or rehosted here.
 ArtCraft Launcher updates itself, so `brew upgrade` leaves it alone unless you run
 `brew upgrade --cask --greedy artcraft-launcher`.
 
-[`update-cask.yml`](.github/workflows/update-cask.yml) checks upstream every 6 hours and commits
+[`update-cask.yml`](.github/workflows/update-cask.yml) checks upstream every hour and commits
 the new `version` and `sha256` when a release is published. Drafts and pre-releases are skipped.
 
 ## Uninstall
