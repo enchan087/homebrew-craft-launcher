@@ -1,0 +1,41 @@
+# Bump Casks/artcraft-launcher.rb to storytold/craft-launcher's latest release.
+# Upstream releases cannot trigger a workflow in this repo, so poll.
+name: Update cask
+
+on:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency: update-cask
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Bump to the latest upstream release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          cask=Casks/artcraft-launcher.rb
+          tag=$(gh release view -R storytold/craft-launcher --json tagName -q .tagName)
+          version=${tag#v}
+          # The tag ends up in sed and the commit message: accept only a plain version.
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?$ ]] || { echo "::error::unexpected tag $tag"; exit 1; }
+          current=$(sed -n 's/^  version "\(.*\)"$/\1/p' "$cask")
+          if [ "$version" = "$current" ]; then echo "up to date ($current)"; exit 0; fi
+
+          dmg="artcraft-launcher-$version-macos-universal.dmg"
+          sha=$(gh release download "$tag" -R storytold/craft-launcher -p SHA256SUMS.txt -O - | awk -v f="$dmg" '$2 == f { print $1 }')
+          [[ "$sha" =~ ^[0-9a-f]{64}$ ]] || { echo "::error::no checksum for $dmg in $tag"; exit 1; }
+
+          sed -i -e "s/^  version \".*\"$/  version \"$version\"/" -e "s/^  sha256 \".*\"$/  sha256 \"$sha\"/" "$cask"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -am "artcraft-launcher $current -> $version"
+          git push
