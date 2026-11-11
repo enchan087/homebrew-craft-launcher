@@ -1,6 +1,6 @@
 cask "artcraft-launcher" do
-  version "0.18.0"
-  sha256 "1dbebf0ba755f928df4a64b1b98bfe5580595e76598b54ee5cbfda3e2f72060b"
+  version "0.19.0"
+  sha256 "142aa0afd159fba13739a0c410aaca54078861f914c1880cef726e8d97c1e1c0"
 
   url "https://github.com/storytold/craft-launcher/releases/download/v#{version}/artcraft-launcher-#{version}-macos-universal.dmg"
   name "ArtCraft Launcher"
